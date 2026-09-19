@@ -158,12 +158,12 @@ def waste_gas_house(total_consumption, facility_subtype, months):
 def waste_gas_company(total_consumption, facility_subtype, facility_size, months):
     try:
         gas_thresholds = {
-            'Bakery': {'small': 2000, 'medium': 6000, 'large': 15000},
-            'Office': {'small': 100, 'medium': 500, 'large': 1200},
-            'Hotel': {'small': 1500, 'medium': 6000, 'large': 15000},
-            'Restaurant': {'small': 500, 'medium': 2000, 'large': 4500},
-            'School': {'small': 300, 'medium': 1500, 'large': 3000},
-            'SuperMarket': {'small': 300, 'medium': 1000, 'large': 2000},
+            'Bakery':      {'small': 8,   'medium': 30,  'large': 90},
+            'Office':      {'small': 10,  'medium': 40,  'large': 120},
+            'Hotel':       {'small': 150, 'medium': 600, 'large': 2000},
+            'Restaurant':  {'small': 20,  'medium': 80,  'large': 250},
+            'School':      {'small': 150, 'medium': 500, 'large': 1200},
+            'SuperMarket': {'small': 40,  'medium': 200, 'large': 600},
         }
         
         base_threshold = 1000
@@ -218,15 +218,15 @@ def waste_electricity_company(total_consumption, facility_subtype, facility_size
 def waste_water_company(total_consumption, facility_subtype, facility_size, months):
     try:
         water_thresholds = {
-            'Bakery': {'small': 5000, 'medium': 20000, 'large': 60000},
-            'Office': {'small': 2500, 'medium': 10000, 'large': 30000},
-            'Hotel': {'small': 10000, 'medium': 40000, 'large': 120000},
-            'Restaurant': {'small': 8000, 'medium': 30000, 'large': 100000},
-            'School': {'small': 3000, 'medium': 12000, 'large': 35000},
-            'SuperMarket': {'small': 10000, 'medium': 50000, 'large': 150000},
+            'Bakery':      {'small': 8,   'medium': 30,  'large': 90},
+            'Office':      {'small': 10,  'medium': 40,  'large': 120},
+            'Hotel':       {'small': 150, 'medium': 600, 'large': 2000},
+            'Restaurant':  {'small': 20,  'medium': 80,  'large': 250},
+            'School':      {'small': 150, 'medium': 500, 'large': 1200},
+            'SuperMarket': {'small': 40,  'medium': 200, 'large': 600},
         }
         
-        base_threshold = 2500
+        base_threshold = 2.5
         if facility_subtype in water_thresholds:
             size = facility_size.lower() if facility_size else 'small'
             if size not in water_thresholds[facility_subtype]:
@@ -258,6 +258,9 @@ def Analytics(df: pd.DataFrame, source_type: str, environment_type: str = "", fa
         else:
             # assume the second column is consumption
             df.rename(columns={df.columns[1]: 'consumption'}, inplace=True)
+
+    if source_type in ['water', 'gas'] and environment_type.lower() == 'company':
+        df['consumption'] = df['consumption'] / 1000.0
 
     # 1. Apply costs to each row
     categories = []

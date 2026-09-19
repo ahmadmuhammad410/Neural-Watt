@@ -167,12 +167,12 @@ def process_company_gas(df, facility_subtype, facility_size, holiday_usage, holi
     def calc_waste(pred, factor=1.0):
         if not pred: return 0.0, 0.0
         gas_thresholds = {
-            'Bakery': {'small': 2000, 'medium': 6000, 'large': 15000},
-            'Office': {'small': 100, 'medium': 500, 'large': 1200},
-            'Hotel': {'small': 1500, 'medium': 6000, 'large': 15000},
-            'Restaurant': {'small': 500, 'medium': 2000, 'large': 4500},
-            'School': {'small': 300, 'medium': 1500, 'large': 3000},
-            'SuperMarket': {'small': 300, 'medium': 1000, 'large': 2000},
+            'Bakery': {'small': 2, 'medium': 6, 'large': 15},
+            'Office': {'small': 0.1, 'medium': 0.5, 'large': 1.2},
+            'Hotel': {'small': 1.5, 'medium': 6, 'large': 15},
+            'Restaurant': {'small': 0.5, 'medium': 2, 'large': 4.5},
+            'School': {'small': 0.3, 'medium': 1.5, 'large': 3},
+            'SuperMarket': {'small': 0.3, 'medium': 1, 'large': 2},
         }
         base_threshold = 1000
         if facility_subtype in gas_thresholds:
@@ -188,10 +188,24 @@ def process_company_gas(df, facility_subtype, facility_size, holiday_usage, holi
             return round(waste_amt, 2), round(waste_pct, 2)
         return 0.0, 0.0
 
-    day_amt, day_pct = calc_waste(forecast.get("Target_Next_Day"), factor=1/30)
-    week_amt, week_pct = calc_waste(forecast.get("Target_Next_Week"), factor=1/4)
-    month_amt, month_pct = calc_waste(forecast.get("Target_Next_Month"), factor=1.0)
-    quarter_amt, quarter_pct = calc_waste(forecast.get("Target_Next_Quarter"), factor=3.0)
+    day_pred = forecast.get("Target_Next_Day")
+    week_pred = forecast.get("Target_Next_Week")
+    month_pred = forecast.get("Target_Next_Month")
+    quarter_pred = forecast.get("Target_Next_Quarter")
+    semi_annual_pred = forecast.get("Target_Next_SemiAnnual")
+    annual_pred = forecast.get("Target_Next_Annual")
+
+    day_pred = day_pred / 1000.0 if day_pred is not None else 0.0
+    week_pred = week_pred / 1000.0 if week_pred is not None else 0.0
+    month_pred = month_pred / 1000.0 if month_pred is not None else 0.0
+    quarter_pred = quarter_pred / 1000.0 if quarter_pred is not None else 0.0
+    semi_annual_pred = semi_annual_pred / 1000.0 if semi_annual_pred is not None else 0.0
+    annual_pred = annual_pred / 1000.0 if annual_pred is not None else 0.0
+
+    day_amt, day_pct = calc_waste(day_pred, factor=1/30)
+    week_amt, week_pct = calc_waste(week_pred, factor=1/4)
+    month_amt, month_pct = calc_waste(month_pred, factor=1.0)
+    quarter_amt, quarter_pct = calc_waste(quarter_pred, factor=3.0)
 
     waste_dict = {
         "waste_day": day_amt,
@@ -205,12 +219,12 @@ def process_company_gas(df, facility_subtype, facility_size, holiday_usage, holi
     }
 
     prediction_result = {
-        "next_day": forecast.get("Target_Next_Day"),
-        "next_week": forecast.get("Target_Next_Week"),
-        "next_month": forecast.get("Target_Next_Month"),
-        "next_quarter": forecast.get("Target_Next_Quarter"),
-        "next_semi_annual": forecast.get("Target_Next_SemiAnnual"),
-        "next_annual": forecast.get("Target_Next_Annual"),
+        "next_day": day_pred,
+        "next_week": week_pred,
+        "next_month": month_pred,
+        "next_quarter": quarter_pred,
+        "next_semi_annual": semi_annual_pred,
+        "next_annual": annual_pred,
         "waste": waste_dict
     }
     

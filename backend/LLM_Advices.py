@@ -220,12 +220,17 @@ def generate_energy_advice(facility_data: dict) -> dict:
                     "type": "waste_reduction",
                     "title": f"Reduce {title_horizon_w} Waste",
                     "message": w_msg.replace(". ", ".\n\n")
-                },
-                {
+                }
+            ]
+            
+            if not (resource == "Gas" and environment == "Company"):
+                messages.append({
                     "type": c_type_value,
                     "title": c_title,
                     "message": c_msg.replace(". ", ".\n\n")
-                },
+                })
+
+            messages.extend([
                 {
                     "type": "equipment_check",
                     "title": "Check Your Equipment",
@@ -236,7 +241,7 @@ def generate_energy_advice(facility_data: dict) -> dict:
                     "title": s_title,
                     "message": s_msg.replace(". ", ".\n\n")
                 }
-            ]
+            ])
             
             output[horizon] = {"messages": messages}
             
